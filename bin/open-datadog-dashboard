@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# TODO validate
+source ~/.datadogrc
+
+search_term="${1}"
+
+# TODO make configurable and/or move to Alfred's workspace?
+cache_path="/tmp/datadog-dashboards.json"
+
+function fetch_dashboards_from_datadog_api {
+  curl -s "https://app.datadoghq.com/api/v1/dash?api_key=${DATADOG_API_KEY}&application_key=${DATADOG_APP_KEY}" > $cache_path
+  cat $cache_path
+}
+
+function fetch_cached_datadog_dashboards {
+  if [ -w $cache_path ]; then
+    local cache_age="$(expr $(date +%s) - $(stat -f '%m' $cache_path))"
+    # TODO make configureable
+    local max_age="300"
+    if [ "${cache_age}" -gt "${max_age}" ]; then
+      fetch_dashboards_from_datadog_api
+    fi
+  else
+      fetch_dashboards_from_datadog_api
+  fi
+  cat $cache_path
+}
+
+function filter_results {
+  jq ".[] | sort_by(.title) | map(select(.title | contains(\"${search_term}\")))"
+}
+
+function present_alfred_items {
+   jq --raw-output "map(\"<item arg=\\\"\(.id)\\\" autocomplete=\\\"\(.title)\\\">\n  <title>\(.title)</title>\n  <icon>datadog-logo.png</icon>\n</item>\n\")[]"
+}
+
+echo '<?xml version="1.0"?>'
+echo '<items>'
+
+  fetch_cached_datadog_dashboards | filter_results | present_alfred_items
+
+echo '</items>'

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+SOURCES=$(cat << EOS
+./assets/6C68D0BB-A89A-4FDD-BB99-B5A5B460646E.png
+./assets/datadog-logo.png
+./assets/icon.png
+./bin/open-datadog-dashboard
+./config/info.plist
+EOS
+)
+
+TARGET="datadog-dashboards.alfredworkflow"
+WORKSPACE="./tmp"
+JQ_VERSION="1.5"
+
+echo "Cleaning..."
+rm -rf $TARGET $WORKSPACE
+mkdir -p $WORKSPACE
+
+echo "Installing dependencies..."
+if [ -x "${WORKSPACE}/jq-osx-amd64" ]; then
+  echo "  jq already installed!"
+else
+  echo "  Installing jq..."
+  cd $WORKSPACE
+  wget -q -O jq "https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-osx-amd64"
+  chmod +x ./jq
+  cd -
+fi
+
+echo "Packaging..."
+echo "$SOURCES" | xargs -I path cp path $WORKSPACE
+cd $WORKSPACE
+zip $TARGET *
+
+echo "Installing..."
+open $TARGET
+
