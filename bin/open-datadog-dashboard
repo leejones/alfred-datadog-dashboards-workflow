@@ -8,8 +8,17 @@ search_term="${1}"
 # TODO make configurable and/or move to Alfred's workspace?
 cache_path="/tmp/datadog-dashboards.json"
 
+function sort_data {
+  jq 'sort_by(.title)'
+}
+
+function select_data {
+  jq 'map({id, title})'
+}
+
 function fetch_dashboards_from_datadog_api {
-  curl -s "https://app.datadoghq.com/api/v1/dash?api_key=${DATADOG_API_KEY}&application_key=${DATADOG_APP_KEY}" > $cache_path
+  local api_url="https://app.datadoghq.com/api/v1/dash?api_key=${DATADOG_API_KEY}&application_key=${DATADOG_APP_KEY}"
+  curl -s "$api_url" | jq '.[]' | select_data | sort_data > $cache_path
   cat $cache_path
 }
 
