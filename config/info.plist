@@ -24,6 +24,14 @@
 				<key>modifiersubtext</key>
 				<string></string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>B572DFF9-221A-4624-B01E-8FE1BED37BF8</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
 		</array>
 	</dict>
 	<key>createdby</key>
@@ -106,6 +114,31 @@ PATH="${PATH}:${PWD}"
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<true/>
+				<key>output</key>
+				<integer>0</integer>
+				<key>removeextension</key>
+				<false/>
+				<key>sticky</key>
+				<false/>
+				<key>text</key>
+				<string>https://app.datadoghq.com/dash/{query} was copied to your clipboard.</string>
+				<key>title</key>
+				<string>Alfred Datadog Dashboards</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>B572DFF9-221A-4624-B01E-8FE1BED37BF8</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -125,6 +158,11 @@ PATH="${PATH}:${PWD}"
 		<dict>
 			<key>ypos</key>
 			<real>270</real>
+		</dict>
+		<key>B572DFF9-221A-4624-B01E-8FE1BED37BF8</key>
+		<dict>
+			<key>ypos</key>
+			<real>400</real>
 		</dict>
 	</dict>
 	<key>webaddress</key>
