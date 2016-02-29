@@ -37,16 +37,58 @@ function fetch_cached_datadog_dashboards {
 }
 
 function filter_results {
-  jq ".[] | sort_by(.title) | map(select(.title | contains(\"${search_term}\")))"
+  grep -i "$search_term"
 }
 
-function present_alfred_items {
-   jq --raw-output "map(\"<item arg=\\\"\(.id)\\\" autocomplete=\\\"\(.title)\\\">\n  <title>\(.title)</title>\n  <icon>datadog-logo.png</icon>\n</item>\n\")[]"
+function columnize_data {
+  # maps over each item in the array and returns data in 4 columns
+  #
+  # 1. id - the ID of the dashboard
+  # 2. tokenized title (first letters split by spaces) - first letter of each word in the dashboard's title
+  #                this provides an alternative way to match titles
+  #                example: "My Awesome App" becomes "MAA"
+  # 3. tokenized title (first letters split by hyphens) - first letter of each hypenated word in the dashboard's title
+  #                this provides an alternative way to match titles
+  #                example: "my-awesome-app" becomes "maa"
+  # 4. title - the full dashboard title
+
+  jq --raw-output 'map("\(.id) \(.title | split(" ") | map(explode[0]) | implode) \(.title | split("-") | map(explode[0]) | implode) \(.title)")[]' | column -c 4
 }
 
-echo '<?xml version="1.0"?>'
-echo '<items>'
+function alfred_items {
+  if [ "$search_term" == "" ]; then
+    fetch_cached_datadog_dashboards | sort_data | columnize_data
+  else
+    fetch_cached_datadog_dashboards | sort_data | columnize_data | filter_results
+  fi
+}
 
-  fetch_cached_datadog_dashboards | filter_results | present_alfred_items
+function present_alfred_item {
+  local id="$1"
+  shift 3
+  local title="$*"
+  if [ "$1" != "" ]; then
+    cat << EOS
+  <item arg="$id" autocomplete="$title">
+    <title>$title</title>
+    <subtitle>Open the "$title" dashboard in Datadog...</subtitle>
+    <subtitle mod="shift">Copy "https://app.datadoghq.com/dash/$title" to your clipboard...</subtitle>
+    <text type="copy">https://app.datadoghq.com/dash/$id</text>
+    <icon>datadog-logo.png</icon>
+  </item>
+EOS
+  fi
+}
 
-echo '</items>'
+function main {
+  echo '<?xml version="1.0"?>'
+  echo '<items>'
+
+  while read -r item; do
+    present_alfred_item $item
+  done <<< "$(alfred_items)"
+
+  echo '</items>'
+}
+
+main
