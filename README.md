@@ -1,6 +1,6 @@
 # alfred-datadog-dashboards-workflow
 
-An Alfred workflow to search your [Datadog](https://www.datadoghq.com) dashboards and select one to open in your default browser.
+An [Alfred](https://www.alfredapp.com/) workflow to search your [Datadog](https://www.datadoghq.com) dashboards and select one to open in your default browser.
 
 ![screenshot of alfred-datadog-dashboards-workflow](docs/screenshot.png)
 
