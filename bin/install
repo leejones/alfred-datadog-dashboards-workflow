@@ -20,7 +20,7 @@ rm -rf $TARGET $WORKSPACE
 mkdir -p $WORKSPACE
 
 echo "Installing dependencies..."
-if [ -x "${WORKSPACE}/jq-osx-amd64" ]; then
+if [ -x "${WORKSPACE}/jq" ]; then
   echo "  jq already installed!"
 else
   echo "  Installing jq..."
